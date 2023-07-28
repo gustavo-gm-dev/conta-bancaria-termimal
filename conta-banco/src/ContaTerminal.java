@@ -2,114 +2,107 @@ import java.util.Scanner;
 
 public class ContaTerminal {
 
-    private String agenciaUsuario;
-    private String agenciaDigito;
-    private int contaUsuario;
-    private String nomeUsuario;
-    private double saldoConta;
+    private int numero;
+    private String agencia;
+    private String nomeCliente;
+    private double saldo;
 
-    // Construtor
-    public ContaTerminal (String agenciaUsuario, String agenciaDigito, int contaUsuario) {
-        this.agenciaUsuario = agenciaUsuario;
-        this.agenciaDigito = agenciaDigito;
-        this.contaUsuario = contaUsuario;
-
+    public ContaTerminal(int numero, String agencia, String nomeCliente, double saldo) {
+        this.numero = numero;
+        this.agencia = agencia;
+        this.nomeCliente = nomeCliente;
+        this.saldo = saldo;
     }
+    
 
-    public String getAgenciaUsuario() {
-        return agenciaUsuario;
-    }
-
-
-
-    public String getAgenciaDigito() {
-        return agenciaDigito;
+    public int getNumero() {
+        return numero;
     }
 
 
-
-    public int getContaUsuario() {
-        return contaUsuario;
+    public void setNumero(int numero) {
+        this.numero = numero;
     }
 
-    // Armanazenamento de usaurio teste
-    public enum Login{
-        CONTA_TESTE("067","8",1021);
 
-        private String agenciaUsuario;
-        private String agenciaDigito;
-        private int contaUsuario;
-
-        private Login(String agenciaUsuario, String agenciaDigito, int contaUsuario) {
-            this.agenciaUsuario = agenciaUsuario;
-            this.agenciaDigito = agenciaDigito;
-            this.contaUsuario = contaUsuario;
-        }
-
-        public String getAgenciaUsuario() {
-            return agenciaUsuario;
-        }
-
-        public String getAgenciaDigito() {
-            return agenciaDigito;
-        }
-
-        public int getContaUsuario() {
-            return contaUsuario;
-        }
+    public String getAgencia() {
+        return agencia;
     }
 
-    // Metodo Login Terminal
-    public boolean LoginTerminal(ContaTerminal minhaConta) {
 
-        Login login = Login.CONTA_TESTE;
-        boolean autenticador = false;
+    public void setAgencia(String agencia) {
+        this.agencia = agencia;
+    }
 
-        if(login.getAgenciaUsuario().equals(minhaConta.getAgenciaUsuario()) && 
-            login.getAgenciaDigito().equals(minhaConta.getAgenciaDigito()) &&
-            login.getContaUsuario() == minhaConta.getContaUsuario()) {
-                autenticador =  true;
-            }
+
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
+    }
+
+    public static boolean CadastrarDados (ContaTerminal contaTerminal) {
+
         
-        return autenticador;
+
+        return false;
     }
 
 
+    public static void main(String[] args) {
+        
+        //Tela de Inicio
+        System.out.println("_________________________________________________\n");
+        System.out.println("    Programa: Crie sua conta bancaria");
+        System.out.println("_________________________________________________\n");
 
-    public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
+        boolean cadastroFinalizado = false;
 
-        ContaTerminal minhaConta = null;
-        boolean autenticador = false;
-        
-        //Lopin validador de login
-        while (!autenticador) {
-            System.out.println("############################################");
-            System.out.println("#               TELA DE LOGIN              #");
-            System.out.println("############################################");
+        //Cadastro de infomacoes do usuario
+        while(!cadastroFinalizado){
+            System.out.print("Primeiro Nome: ");
+            String primeiroNome = scanner.next();
+            System.out.print("Sobrenome: ");
+            String sobrenome = scanner.next();
+    
+            System.out.print("Agencia (com ultimo digito): ");
+            String agenciaUsuario = scanner.next();
+            System.out.print("Conta (sem ultimo digito): ");
+            int contaUsuario = scanner.nextInt();
+            scanner.nextLine();
 
-            System.out.println("#  Insira os dados da sua Agência e Conta  #");
+            System.out.print("Valor que deseja depositar: ");
+            double saldoDepositado = scanner.nextDouble();
 
-            System.out.print("  Agencia (sem o digito): ");
-                String numeroAgencia = scanner.next();
-            System.out.print("  Digito: ");
-                String digitoAgencia = scanner.next();
+            ContaTerminal contaTerminal = new ContaTerminal(contaUsuario,
+                                                            agenciaUsuario,
+                                                            primeiroNome.concat(" " + sobrenome),
+                                                            saldoDepositado);
             
-            System.out.print("  Conta: ");
-                int numeroConta = scanner.nextInt();
-                scanner.nextLine();
+            cadastroFinalizado = CadastrarDados(contaTerminal);
 
-            minhaConta = new ContaTerminal(numeroAgencia, digitoAgencia, numeroConta);
-            autenticador = minhaConta.LoginTerminal(minhaConta);
-
-            if(autenticador) {
-                System.out.println("\n#      Login bem-sucedido. Bem-vindo!      #\n\n");
-            } else {
-                System.out.println("\n#    Error: agencia ou conta incorretas    #\n\n");
-            }
         }
 
 
-        scanner.close();
+        //Tela de boas vindas
+        System.out.println("Olá [Nome Cliente], obrigado por criar uma conta em " +
+            "nosso banco, sua agência é [Agencia], conta [Numero] e" +
+            "seu saldo [Saldo] já está disponível para saque");
+
     }
+
 }
