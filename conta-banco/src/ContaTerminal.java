@@ -1,5 +1,8 @@
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ContaTerminal {
 
@@ -60,8 +63,13 @@ public class ContaTerminal {
     public static boolean CadastrarDados (ContaTerminal contaTerminal) {
 
         //Validando se o usuario informou o nome
-        if(!contaTerminal.getNomeCliente().matches("[a-zA-Z]+")){
-            System.out.println("Favor informe seu nome corretamente.");
+        
+        String padrao = "[a-zA-Z áàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ ]+";
+        Pattern pattern = Pattern.compile(padrao);
+        Matcher matcher = pattern.matcher(contaTerminal.getNomeCliente());
+
+        if(!matcher.matches()){
+            System.out.println("Favor informe seu nome corretamente, sem acentos e caracteres especiais.");
             LOGGER.info("Erro ao validar nome: " + contaTerminal.getNomeCliente());
             return false;
         }
@@ -70,12 +78,17 @@ public class ContaTerminal {
         if(!contaTerminal.getAgencia().contains("-")){
             int tamanhoString = contaTerminal.getAgencia().length();
             String validandoAgencia = contaTerminal.getAgencia();
-            contaTerminal.setAgencia(validandoAgencia.substring(0, tamanhoString - 1) + validandoAgencia.charAt(validandoAgencia.length() - 1));
-            LOGGER.info("Erro ao adcionar um hifen na agencia");
+            contaTerminal.setAgencia(validandoAgencia.substring(0, tamanhoString - 1) + "-" + validandoAgencia.charAt(validandoAgencia.length() - 1));
         } 
+
         if(!contaTerminal.getAgencia().matches("[0-9]+-[0-9]{1}")){
             System.out.println("Agencia informada incorreta. Exemplo: 1234-0");
             LOGGER.info("Erro ao validar agencia");
+            return false;
+        }
+
+        if(!(contaTerminal.getAgencia().length() >= 5 || contaTerminal.getAgencia().length() <= 6)){
+            System.out.println("Agencia invalida. Certifique-se de validar se informou de 4 a 5 caracteres com o digito");
             return false;
         }
 
@@ -88,8 +101,16 @@ public class ContaTerminal {
 
         //Validando se o saldo foi informado corretamente
         if(!(contaTerminal.getSaldo() > 0.01)){
-            System.out.println("Favor informar um quantia no sando. Lembre de usar '.' para o decimal Ex: 100.50");
+            System.out.println("Favor informar um quantia no sando. Lembre de usar ',' para o decimal Ex: 100.50");
             LOGGER.info("Erro na validação do saldo");
+            return false;
+        }
+
+        double multiplicador = Math.pow(10, 2);
+        double resultado = contaTerminal.getSaldo() * multiplicador;
+
+        if(!(resultado % 1 == 0)){
+            System.out.println("Favor informal uma quantia com apenas duas casas deciamis");
             return false;
         }
 
@@ -98,22 +119,26 @@ public class ContaTerminal {
 
 
     public static void main(String[] args) {
-        
-        //Tela de Inicio
-        System.out.println("_________________________________________________\n");
-        System.out.println("    Programa: Crie sua conta bancaria");
-        System.out.println("_________________________________________________\n");
 
+        System.setProperty("file.encoding", "UTF-8");
+        Locale locale = new Locale("pt", "BR");
+        Locale.setDefault(locale);
+        
+        ContaTerminal contaTerminal = null;
         Scanner scanner = new Scanner(System.in);
         boolean cadastroFinalizado = false;
 
         //Cadastro de infomacoes do usuario
         while(!cadastroFinalizado){
             try {
+                //Tela de Inicio
+                System.out.println("_________________________________________________\n");
+                System.out.println("    Programa: Crie sua conta bancaria");
+                System.out.println("_________________________________________________\n");
+
                 System.out.print("Primeiro Nome: ");
                 String primeiroNome = scanner.nextLine();
                 
-
                 System.out.print("Sobrenome: ");
                 String sobrenome = scanner.nextLine();
         
@@ -124,11 +149,16 @@ public class ContaTerminal {
                 int contaUsuario = scanner.nextInt();
                 scanner.nextLine();
     
-                System.out.print("Valor que deseja depositar (Utilizar separador decimal '.'): ");
+                System.out.print("Valor que deseja depositar (Utilizar separador decimal ','): ");
                 double saldoDepositado = scanner.nextDouble();
                 scanner.nextLine();
+
+                if(primeiroNome.isEmpty() || agenciaUsuario.isEmpty() || contaUsuario == 0 || saldoDepositado == 0){
+                    System.out.println("Favor informar todos os campos para que possa prosseguir.");
+                    continue;
+                }
     
-                ContaTerminal contaTerminal = new ContaTerminal(contaUsuario,
+                contaTerminal = new ContaTerminal(contaUsuario,
                                                                 agenciaUsuario,
                                                                 primeiroNome.concat(" " + sobrenome),
                                                                 saldoDepositado);
@@ -142,9 +172,12 @@ public class ContaTerminal {
         scanner.close();
 
         //Tela de boas vindas
-        System.out.println("Olá [Nome Cliente], obrigado por criar uma conta em " +
-            "nosso banco, sua agência é [Agencia], conta [Numero] e" +
-            "seu saldo [Saldo] já está disponível para saque");
+                System.out.println("\n_________________________________________________\n");
+                System.out.println("                     BEM VINDO");
+                System.out.println("_________________________________________________\n");
+        System.out.println("Olá " + contaTerminal.getNomeCliente() + ", obrigado por criar uma conta \n" +
+            "em nosso banco, sua agência é " + contaTerminal.getAgencia() + ", conta " + contaTerminal.getNumero() + " e \n" +
+            "seu saldo " + contaTerminal.getSaldo() + " já está disponível para saque.");
 
     }
 
